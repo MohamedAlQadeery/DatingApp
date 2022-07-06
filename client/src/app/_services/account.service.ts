@@ -15,18 +15,27 @@ export class AccountService {
   constructor( private _http:HttpClient ) { }
 
 
-
+  Register(model:any){
+    return this._http.post(this.baseUrl+'account/register',model).pipe(
+      this.MapUserLocalStorage()
+    )
+  }
 
   Login(model:any){
    return this._http.post(this.baseUrl +'account/login',model).pipe(
-    map((response:IUser)=>{
+    this.MapUserLocalStorage()
+   )
+  }
+
+  private MapUserLocalStorage() {
+    return map((response: IUser) => {
       const user = response;
-      if(user){
-        localStorage.setItem('user',JSON.stringify(user));
+      if (user) {
+        localStorage.setItem('user', JSON.stringify(user));
         this.currentUserSource.next(user);
       }
-    })
-   )
+    //  return user;
+    });
   }
 
   SetCurrentUser(user : IUser){
