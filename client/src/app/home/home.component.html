@@ -1,0 +1,19 @@
+<section class="jumbotron text-center" *ngIf="!registerMode">
+  <div class="container">
+    <h1>Dating App</h1>
+    <p class="lead text-muted">Come on in to view your matches .. all you need to do is to sign up !</p>
+    <p>
+      <a href="#" class="btn btn-primary my-2" (click)="ToggleRegisterMode()">Register</a>
+      <a href="#" class="btn btn-secondary my-2">Learn more</a>
+    </p>
+  </div>
+</section>
+
+
+<div class="container" *ngIf="registerMode">
+  <div class="row justify-content-center">
+    <div class="col-4">
+      Register form goes here
+    </div>
+  </div>
+</div>
