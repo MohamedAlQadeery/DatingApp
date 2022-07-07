@@ -1,3 +1,9 @@
-a.dropdown-toggle.text-light,.dropdown-item {
+a.dropdown-toggle.text-light,.dropdown-item,.welcomeUser {
 cursor: pointer;
+text-decoration: none;
+color: white;
+}
+
+a.dropdown-item{
+color: black;
 }
