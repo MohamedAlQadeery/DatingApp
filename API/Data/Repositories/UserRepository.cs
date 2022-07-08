@@ -55,6 +55,8 @@ namespace API.Data.Repositories
             return await _context.SaveChangesAsync() > 0;
         }
 
+        //make user flagged as being updated 
+        //we guranty no exception 
         public void Update(AppUser user)
         {
             _context.Entry(user).State = EntityState.Modified;

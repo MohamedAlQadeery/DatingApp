@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace API.Controllers
 {
@@ -23,19 +24,17 @@ namespace API.Controllers
             _mapper = mapper;
         }
 
-        [HttpGet]
-      
         /**
          * Repo gets users and maps it to member dto
          */
+        [HttpGet]
         public async Task<ActionResult<IEnumerable<MemberDto>>> GetUsers()
         {
             var members =await _userRepository.GetMembersAsync();
             return Ok(members);
         }
 
-        [HttpGet("{username}")]
-        
+        [HttpGet("{username}")]  
         public async Task<ActionResult<MemberDto>> GetUser(string username)
         {
             var member = await _userRepository.GetMemeberAsync(username);
@@ -46,6 +45,24 @@ namespace API.Controllers
             }
 
             return Ok(member);
+        }
+
+        [HttpPut]
+        public async Task<ActionResult> UpdateProfile(UpdateMemberDto updateMemberDto)
+        {
+            var username = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var user = await _userRepository.GetUserByUsernameAsync(username);
+
+            _mapper.Map(updateMemberDto, user);
+
+            //
+            _userRepository.Update(user);
+            if(await _userRepository.SaveAllAsync())
+            {
+                return NoContent();
+            }
+
+            return BadRequest("Could not update !");
         }
 
     }
