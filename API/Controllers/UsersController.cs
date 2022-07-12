@@ -102,29 +102,48 @@ namespace API.Controllers
         }
 
 
+       
+
+
+        [HttpPut("set-main-photo/{photoId}")]
+        public async Task<ActionResult> SetMainPhoto(int photoId)
+        {
+            var user = await _userRepository.GetUserByUsernameAsync(User.GetUsername());
+
+            var photo = user.Photos.FirstOrDefault(p => p.Id == photoId);
+
+            if (photo.IsMain) return BadRequest("Photo is alredy main !");
+
+            //set current main photo to false
+            user.Photos.FirstOrDefault(p => p.IsMain).IsMain=false;
+            //update new photo to main = true
+            photo.IsMain = true;
+
+            if (await _userRepository.SaveAllAsync()) return NoContent();
+
+            return BadRequest("Something went wrong in setting main photo !");
+            
+        }
+
         [HttpDelete("delete-photo/{photoId}")]
         public async Task<ActionResult> DeletePhoto(int photoId)
         {
             var user = await _userRepository.GetUserByUsernameAsync(User.GetUsername());
 
-            var photo = user.Photos.FirstOrDefault(x => x.Id == photoId);
+            var photo = user.Photos.FirstOrDefault(p => p.Id == photoId);
 
             if (photo == null) return NotFound();
-
-            if (photo.IsMain) return BadRequest("You cannot delete your main photo");
-
-            if (photo.PublicId != null)
+            if (photo.IsMain) return BadRequest("You cant delete main photo!");
+            if(photo.PublicId != null)
             {
-                var result = await _photoService.DeletePhotoAsync(photo.PublicId);
-                if (result.Error != null) return BadRequest(result.Error.Message);
+                var res = await _photoService.DeletePhotoAsync(photo.PublicId);
+                if (res.Error != null) return BadRequest(res.Error.Message);
             }
 
             user.Photos.Remove(photo);
+            if (await _userRepository.SaveAllAsync()) return NoContent();
 
-            if (await _userRepository.SaveAllAsync()) return Ok();
-
-            return BadRequest("Failed to delete the photo");
+            return BadRequest("Something went wrong ");
         }
-
     }
 }
