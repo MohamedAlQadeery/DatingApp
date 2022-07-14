@@ -59,8 +59,14 @@ export class PhotoEditorComponent implements OnInit {
       if (response) {
         console.log('inside onSuccessItem() success ');
         console.log(response);
-        const photo = JSON.parse(response);
+        const photo: IPhoto = JSON.parse(response);
         this.member.photos.push(photo);
+        if (photo.isMain) {
+          this.user.photoUrl = photo.url;
+          this.member.photoUrl = photo.url;
+          this._accountService.SetCurrentUser(this.user);
+        }
+        this._tostrService.success(' Photo has been uploaded successfully !');
       }
     };
   }

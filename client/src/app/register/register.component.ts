@@ -7,6 +7,7 @@ import {
   ValidatorFn,
   Validators,
 } from '@angular/forms';
+import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { AccountService } from '../_services/account.service';
 
@@ -18,20 +19,30 @@ import { AccountService } from '../_services/account.service';
 export class RegisterComponent implements OnInit {
   @Output() registerMode = new EventEmitter<boolean>();
   registerForm: FormGroup;
+  maxDate: Date;
+  validationErrors: string[] = [];
+
   constructor(
     private _accountService: AccountService,
     private _toastr: ToastrService,
-    private _fb: FormBuilder
+    private _fb: FormBuilder,
+    private _router: Router
   ) {}
 
   model: any = {};
   ngOnInit(): void {
     this.InitilaizeRegisterForm();
+    this.maxDate.setFullYear(this.maxDate.getFullYear() - 18);
   }
 
   InitilaizeRegisterForm() {
     this.registerForm = this._fb.group({
+      gender: ['male'],
       username: ['', [Validators.required]],
+      knownAs: ['', Validators.required],
+      dateOfBirth: ['', Validators.required],
+      city: ['', Validators.required],
+      country: ['', Validators.required],
       password: [
         '',
         [
@@ -46,20 +57,20 @@ export class RegisterComponent implements OnInit {
       ],
     });
 
+    //validtate password input on every change
     this.registerForm.controls.password.valueChanges.subscribe(() => {
       this.registerForm.controls.confirmPassword.updateValueAndValidity();
     });
   }
   Register(): void {
-    // this._accountService.Register(this.model).subscribe(
-    //   (response) => {
-    //     this.Cancel();
-    //   },
-    //   (error) => {
-    //     console.log(error);
-    //     this._toastr.error(error.error);
-    //   }
-    // );
+    this._accountService.Register(this.registerForm.value).subscribe(
+      () => {
+        this._router.navigateByUrl('/members');
+      },
+      (error) => {
+        this.validationErrors = error;
+      }
+    );
   }
 
   Cancel() {
