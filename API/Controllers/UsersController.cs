@@ -2,6 +2,7 @@
 using API.DTOs;
 using API.Entities;
 using API.Extensions;
+using API.Helpers;
 using API.Interfaces.Repositories;
 using API.Interfaces.Services;
 using AutoMapper;
@@ -32,9 +33,10 @@ namespace API.Controllers
          * Repo gets users and maps it to member dto
          */
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<MemberDto>>> GetUsers()
+        public async Task<ActionResult<IEnumerable<MemberDto>>> GetUsers([FromQuery] UserParams userParams)
         {
-            var members =await _userRepository.GetMembersAsync();
+            var members =await _userRepository.GetMembersAsync(userParams);
+            Response.AddPaginationHeader(members.CurrentPage,members.PageSize,members.TotalPages,members.TotalCount);
             return Ok(members);
         }
 
