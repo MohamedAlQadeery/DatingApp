@@ -1,5 +1,4 @@
-﻿using API.Data;
-using API.DTOs;
+﻿using API.DTOs;
 using API.Entities;
 using API.Extensions;
 using API.Helpers;
@@ -7,14 +6,11 @@ using API.Interfaces.Repositories;
 using API.Interfaces.Services;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System.Security.Claims;
 
 namespace API.Controllers
 {
-  
+
     [Authorize]
     public class UsersController : BaseApiController
     {
@@ -35,6 +31,15 @@ namespace API.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<MemberDto>>> GetUsers([FromQuery] UserParams userParams)
         {
+            var user = await _userRepository.GetUserByUsernameAsync(User.GetUsername());
+            userParams.CurrentUsername = user.UserName;
+
+            if (string.IsNullOrEmpty(userParams.Gender))
+            {
+                userParams.Gender = user.Gender == "male" ? "female" : "male";
+            }
+
+
             var members =await _userRepository.GetMembersAsync(userParams);
             Response.AddPaginationHeader(members.CurrentPage,members.PageSize,members.TotalPages,members.TotalCount);
             return Ok(members);
@@ -56,6 +61,8 @@ namespace API.Controllers
         [HttpPut]
         public async Task<ActionResult> UpdateProfile(UpdateMemberDto updateMemberDto)
         {
+           
+
             var username = User.GetUsername();
             var user = await _userRepository.GetUserByUsernameAsync(username);
 

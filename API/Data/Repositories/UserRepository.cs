@@ -6,6 +6,8 @@ using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
 
+
+
 namespace API.Data.Repositories
 {
     public class UserRepository : IUserRepository
@@ -21,11 +23,18 @@ namespace API.Data.Repositories
 
         public async Task<PagedList<MemberDto>> GetMembersAsync(UserParams userParams)
         {
-            var qurey = _context.Users
-                .ProjectTo<MemberDto>(_mapper.ConfigurationProvider)
-                .AsNoTracking();
+         
+            var qurey = _context.Users.AsQueryable();
+            qurey = qurey.Where(u => u.UserName != userParams.CurrentUsername);
+            qurey = qurey.Where(u => u.Gender == userParams.Gender);
 
-            return await PagedList<MemberDto>.CreateAsync(qurey,userParams.PageNumber,userParams.PageSize);
+            var minDob = DateTime.Today.AddYears(-userParams.maxAge - 1);
+            var maxDob = DateTime.Today.AddYears(-userParams.minAge - 1);
+
+            qurey = qurey.Where(u => u.DateOfBirth >= minDob && u.DateOfBirth <= maxDob);
+            return await PagedList<MemberDto>.CreateAsync(
+                qurey.ProjectTo<MemberDto>(_mapper.ConfigurationProvider).AsNoTracking()
+                , userParams.PageNumber,userParams.PageSize);
         }
 
         public async Task<MemberDto> GetMemeberAsync(string username)
