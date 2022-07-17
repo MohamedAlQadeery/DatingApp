@@ -28,10 +28,18 @@ namespace API.Data.Repositories
             qurey = qurey.Where(u => u.UserName != userParams.CurrentUsername);
             qurey = qurey.Where(u => u.Gender == userParams.Gender);
 
-            var minDob = DateTime.Today.AddYears(-userParams.maxAge - 1);
-            var maxDob = DateTime.Today.AddYears(-userParams.minAge - 1);
+            var minDob = DateTime.Today.AddYears(-userParams.MaxAge - 1);
+            var maxDob = DateTime.Today.AddYears(-userParams.MinAge - 1);
 
             qurey = qurey.Where(u => u.DateOfBirth >= minDob && u.DateOfBirth <= maxDob);
+
+            //order by
+
+            qurey =  userParams.OrderBy switch
+            {
+                "created" => qurey.OrderByDescending(u => u.CreatedAt),
+                _=>qurey.OrderByDescending(u=>u.LastActive)
+            };
             return await PagedList<MemberDto>.CreateAsync(
                 qurey.ProjectTo<MemberDto>(_mapper.ConfigurationProvider).AsNoTracking()
                 , userParams.PageNumber,userParams.PageSize);

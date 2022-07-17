@@ -27,6 +27,10 @@ export class MemberListComponent implements OnInit {
   pagination: IPagination;
   userParams: UserParams;
   user: IUser;
+  // genderList = [
+  //   { value: 'male', display: 'Male' },
+  //   { value: 'female', display: 'Female' },
+  // ];
 
   ngOnInit(): void {
     this.LoadMembers();
@@ -39,6 +43,10 @@ export class MemberListComponent implements OnInit {
     });
   }
 
+  ResetFilters() {
+    this.userParams = new UserParams(this.user);
+    this.LoadMembers();
+  }
   PageChanged(event: any) {
     this.userParams.pageNumber = event.page;
     this.LoadMembers();
