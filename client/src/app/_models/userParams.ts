@@ -2,7 +2,7 @@ import { IUser } from './user';
 
 export class UserParams {
   pageNumber = 1;
-  pageSize = 6;
+  pageSize = 10;
 
   minAge = 18;
   maxAge = 100;

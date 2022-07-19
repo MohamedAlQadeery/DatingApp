@@ -1,6 +1,7 @@
 ﻿using API.DTOs;
 using API.Entities;
 using API.Extensions;
+using API.Helpers;
 using API.Interfaces.Repositories;
 using Microsoft.EntityFrameworkCore;
 
@@ -27,19 +28,19 @@ namespace API.Data.Repositories
             return await _context.UserLike.FindAsync(sourceUserId, likedUserId);
         }
 
-        public async Task<IEnumerable<LikeDto>> GetUserLikesAsync(string type, int userId)
+        public async Task<PagedList<LikeDto>> GetUserLikesAsync(LikesParams likesParams)
         {
             var users = _context.Users.OrderBy(u => u.UserName).AsQueryable();
             var likes = _context.UserLike.AsQueryable();
 
-            if(type == "liked")
+            if(likesParams.Type == "liked")
             {
-                likes = likes.Where(like => like.SourceUserId == userId);
+                likes = likes.Where(like => like.SourceUserId == likesParams.UserId);
 
                 users = likes.Select(like => like.LikedUser); //liked users by auth user
-            }else if(type== "likedBy")
+            }else if(likesParams.Type == "likedBy")
             {
-                likes = likes.Where(like => like.LikedUserId == userId);
+                likes = likes.Where(like => like.LikedUserId == likesParams.UserId);
                 users = likes.Select(like => like.SourceUser); // users who liked auth user
             }
             else
@@ -47,9 +48,7 @@ namespace API.Data.Repositories
                 return null;
             }
 
-     
-
-            return await users.Select(user => new LikeDto
+            var likedUsers = users.Select(user => new LikeDto
             {
                 Username = user.UserName,
                 Age = user.DateOfBirth.CalculateAge(),
@@ -57,7 +56,11 @@ namespace API.Data.Repositories
                 City = user.City,
                 KnownAs = user.KnownAs,
                 Id = user.Id
-            }).ToListAsync();
+            });
+
+
+
+            return await PagedList<LikeDto>.CreateAsync(likedUsers, likesParams.PageNumber, likesParams.PageSize);
         }
 
         public async Task<AppUser> GetUserWithLikesAsync(int userId)

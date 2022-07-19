@@ -1,5 +1,6 @@
 ﻿using API.DTOs;
 using API.Extensions;
+using API.Helpers;
 using API.Interfaces.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -44,10 +45,13 @@ namespace API.Controllers
 
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<LikeDto>>> GetUserLikes(string type)
+        public async Task<ActionResult<PagedList<LikeDto>>> GetUserLikes([FromQuery] LikesParams likesParams)
         {
-            var userLikes = await _likesRepository.GetUserLikesAsync(type,User.GetUserId());
+            likesParams.UserId = User.GetUserId();
+            var userLikes = await _likesRepository.GetUserLikesAsync(likesParams);
             if (userLikes == null) return BadRequest("You entered wrong type!");
+            Response.AddPaginationHeader(userLikes.CurrentPage, userLikes.PageSize, 
+                userLikes.TotalPages, userLikes.TotalCount);
             return Ok(userLikes);
         }
     }

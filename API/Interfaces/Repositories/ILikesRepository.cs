@@ -1,5 +1,6 @@
 ﻿using API.DTOs;
 using API.Entities;
+using API.Helpers;
 
 namespace API.Interfaces.Repositories
 {
@@ -8,7 +9,7 @@ namespace API.Interfaces.Repositories
         Task<UserLike> GetUserLikeAsync(int sourceUserId, int likedUserId);
         Task<AppUser> GetUserWithLikesAsync(int userId);
 
-        Task<IEnumerable<LikeDto>> GetUserLikesAsync(string type, int userId);
+        Task<PagedList<LikeDto>> GetUserLikesAsync(LikesParams likesParams);
         Task<bool> SaveAllAsync();
         Task<bool> AddLike(int sourceUserId,int likeUserId); 
     }

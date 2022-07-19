@@ -95,4 +95,18 @@ export class MembersService {
   DeletePhoto(photoId: Number) {
     return this._http.delete(this.baseUrl + 'users/delete-photo/' + photoId);
   }
+
+  AddLike(username: string) {
+    return this._http.post(this.baseUrl + 'likes/' + username, {});
+  }
+
+  GetUserLikes(type: string, pageNumber, pageSize) {
+    let params = this.GetPaginationHeaders(pageNumber, pageSize);
+    params = params.append('type', type);
+
+    return this.GetPaginatedResult<Partial<IMember[]>>(
+      this.baseUrl + 'likes/',
+      params
+    );
+  }
 }
