@@ -9,9 +9,9 @@ namespace API.Interfaces.Repositories
         void AddMessage(Message message);
         void DeleteMessage(Message message);
         Task<bool> SaveAllAsnyc();
-        Task<IEnumerable<MessageDto>> GetMessageThread(int currentUserId, int recieverId);
+        Task<IEnumerable<MessageDto>> GetMessageThread(string currentUsername, string recieverUsername);
 
         Task<Message> GetMessageAsync(int id);
-        Task<PagedList<MessageDto>> GetMessagesForUserAsync();
+        Task<PagedList<MessageDto>> GetMessagesForUserAsync(MessagesParams messagesParams);
     }
 }
