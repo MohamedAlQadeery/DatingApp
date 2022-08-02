@@ -39,23 +39,23 @@
 
 
   <div class="col-8 mb-4 ml-4 card border-primary">
-    <tabset class="member-tabset member-details">
-      <tab heading='About {{member.knownAs}}'>
+    <tabset class="member-tabset member-details" #memberTabs>
+      <tab heading='About {{member.knownAs}}' (selectTab)="LoadActiveTab($event)">
           <h4>Description</h4>
           <p>{{member.introduction}}</p>
           <h4>Looking for</h4>
           <p>{{member.lookingFor}}</p>
       </tab>
-      <tab heading='Interests' >
+      <tab heading='Interests'  (selectTab)="LoadActiveTab($event)">
           <h4>Interests</h4>
           <p>{{member.interests}}</p>
       </tab>
-      <tab heading='Photos'>
+      <tab heading='Photos'  (selectTab)="LoadActiveTab($event)">
         <ngx-gallery [options]="galleryOptions" [images]="galleryImages"
          style="display: inline-block; margin-bottom: 20px;"></ngx-gallery>
       </tab>
-      <tab heading='Messages'>
-          <p>Messages will go here</p>
+      <tab heading='Messages'  (selectTab)="LoadActiveTab($event)">
+          <app-member-messages [messages]="messages" [username]="member.username"></app-member-messages>
       </tab>
   </tabset>
   </div>
